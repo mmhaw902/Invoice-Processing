@@ -1,0 +1,162 @@
+<!-- templates/index.html -->
+<html>
+<head>
+<title>Invoice Processing(OCR)</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />        
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<style>
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+#customers {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#customers td, #customers th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#customers tr:nth-child(even){background-color: #f2f2f2;}
+
+#customers tr:hover {background-color: #ddd;}
+
+#customers th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  color: white;
+}
+.loader {
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 150px;
+  height: 150px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
+
+</head>
+<body>
+    <!-- <div  id="loader" ></div> -->
+    <div align="center">
+        <h1  style="padding: 15px 25px; background-color: #5bc0de; width: 500px; color: white; border-radius: 100px;">Invoice Processing(OCR)</h1>
+        <div  id="loader" ></div>
+    </div>
+
+<div class="container">
+<div class="row">
+    <h2>Select a file to upload</h2>
+    <p>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul>
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+    </p>
+    
+    {% if filename %}
+
+        <div>
+
+        <table  style="width:100%" id="customers" >
+         <thead>
+             <tr>
+                 <th bgcolor="#04AA6D">Date</th>
+                 <th bgcolor="#04AA6D">Invoice</th>
+                 <th bgcolor="#04AA6D">Organization Name</th>
+             </tr>
+         <tbody>
+             <tr>
+                 <td>{{filename.get('dict').get('Date: ')}}</td>
+                 <td>{{filename.get('dict').get('Invoice: ')}}</td>
+                 <td>{{filename.get('dict').get('Organization Name: ')}}</td>
+             </tr>
+         </tbody>    
+         </thead>   
+        </table>        
+
+        <table  style="width:100%" id="customers">
+        <thead> 
+        <tr>  
+            {%for j in range(filename.get('data')[0]|length)%}
+            {%if filename.get('flags')== 'red' %}
+                <th bgcolor="red"> {{filename.get('data')[0][j]}} </th>
+            {%else%}
+                <th bgcolor="#04AA6D"> {{filename.get('data')[0][j]}} </th>
+            {%endif%}
+
+            {%endfor%}    
+        </tr>
+        <br>   
+        </thead> 
+        <tbody>
+
+        <tr>{%for i in range(1, filename.get('data')|length)%}
+            {%for k in (filename.get('data')[i])%}
+            {%if k== '\n\n\n\n'%}
+                <td bgcolor="#5bc0de" ><br><strong>PAYABLE</strong></td>
+            {%else%}    
+                <td> {{k}} </td>
+            {%endif%}    
+                
+                    
+
+                
+            {%endfor%}
+        </tr>        
+        {%endfor%}
+        </tbody> 
+        </table>
+            <br> 
+            <!-- <h3 style="padding: 15px 15px; background-color: seagreen; width: 200px; color: white; border-radius: 30px;">{{filename.get('flags')}}</h3> -->
+            <!-- <strong>{{filename.get('flags')}}</strong> -->
+
+        
+    {% endif %}
+    </div>
+        
+    <form method="post" action="/" enctype="multipart/form-data">
+        <dl>
+            <p>
+                <input type="file" name="file" class="form-control" autocomplete="off" required>
+            </p>
+        </dl>
+        <p>
+            <input type="submit" value="Submit" class="btn btn-info" onclick="startLoader()" >
+        </p>
+    </form>
+    <script type="text/javascript">
+        function startLoader() {
+            document.getElementById("loader").className = "loader";
+        }
+
+        function removeLoader(){
+            var element = document.getElementById("loader").classList.remove("loader");
+        }
+    </script>    
+        
+</div>
+</div>
+</body>
+</html>
